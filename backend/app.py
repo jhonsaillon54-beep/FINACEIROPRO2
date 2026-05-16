@@ -13,6 +13,12 @@ from werkzeug.utils import secure_filename
 import mysql.connector
 
 app = Flask(__name__)
+@app.route('/')
+def home():
+    return jsonify({
+        "status": "online",
+        "api": "FINACEIROPRO2"
+    })
 app.config["SECRET_KEY"]               = "financepro-jwt-secret-2024"
 app.config["JWT_SECRET_KEY"]           = "financepro-jwt-secret-2024"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=48)
