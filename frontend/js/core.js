@@ -22,7 +22,7 @@ async function apiFetch(path, opts) {
   if (token) headers['Authorization'] = 'Bearer ' + token;
   if (opts.headers) { for (var k in opts.headers) headers[k] = opts.headers[k]; }
 
-  var res = await fetch(API + path, {
+  var res = await fetch(API_URL + path, {
     method:  opts.method  || 'GET',
     headers: headers,
     body:    opts.body    || undefined
