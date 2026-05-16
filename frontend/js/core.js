@@ -1,4 +1,4 @@
-const API = 'http://localhost:5000/api';
+const API_URL = "https://finaceiropro2.onrender.com";
 
 const Auth = {
   token:    () => localStorage.getItem('fp_token'),
