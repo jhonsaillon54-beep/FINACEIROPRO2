@@ -972,7 +972,7 @@ function bindProfile() {
     // Upload para o servidor
     var fd=new FormData(); fd.append('avatar',file);
     try {
-      var res=await fetch('http://localhost:5000/api/profile/avatar',{
+      var res=await fetch(`${API_URL}/api/profile/avatar`, {
         method:'POST',
         headers:{'Authorization':'Bearer '+Auth.token()},
         body:fd
