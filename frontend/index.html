@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dashboard — FinancePro</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="toastWrap" class="toast-wrap"></div>
+
+<div class="app">
+<!-- ════════════ SIDEBAR ════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-logo">
+      <div class="brand-icon">💰</div>
+      <span class="brand-name">FinancePro</span>
+    </div>
+    <div class="brand-version">v2.0 — Personal Finance</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <a class="nav-item active" id="nav-dash"    href="#"><span class="nav-icon">📊</span>Dashboard</a>
+      <a class="nav-item"        id="nav-tx"      href="#"><span class="nav-icon">💳</span>Transações</a>
+      <a class="nav-item"        id="nav-cat"     href="#"><span class="nav-icon">🏷️</span>Categorias</a>
+      <a class="nav-item"        id="nav-goals"   href="#"><span class="nav-icon">🎯</span>Metas</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Conta</div>
+      <a class="nav-item"  id="nav-profile" href="#"><span class="nav-icon">👤</span>Perfil</a>
+      <a class="nav-item"  id="nav-logout"  href="#"><span class="nav-icon">🚪</span>Sair</a>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-card" id="nav-profile-card">
+      <div class="user-avatar" id="sbAvatar">U</div>
+      <div class="user-info">
+        <div class="user-name"  id="sbName">—</div>
+        <div class="user-email" id="sbEmail">—</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ════════════ MAIN ════════════ -->
+<div class="main">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-sub"   id="topbarSub">Visão geral das suas finanças</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-primary" id="btnNewTx">➕ Nova Transação</button>
+    </div>
+  </header>
+
+  <div class="main-inner">
+
+  <!-- ══ PAGE: DASHBOARD ══ -->
+  <div class="page active" id="page-dash">
+    <!-- PERIOD BAR -->
+    <div class="period-bar">
+      <div class="period-tabs">
+        <button class="p-btn active" data-period="week">Semana</button>
+        <button class="p-btn"        data-period="month">Mês</button>
+        <button class="p-btn"        data-period="year">Ano</button>
+      </div>
+      <div class="period-nav">
+        <button id="periodPrev">‹</button>
+        <div class="period-label" id="periodLabel">—</div>
+        <button id="periodNext">›</button>
+      </div>
+      <button class="period-today" id="periodToday">Hoje</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card" style="--card-accent:var(--accent)">
+        <div class="stat-card-icon" style="background:rgba(99,102,241,.15)">💰</div>
+        <div class="stat-card-label">Saldo do Período</div>
+        <div class="stat-card-value" id="stBalance">R$ 0,00</div>
+        <div class="stat-card-sub"   id="stBalanceSub">—</div>
+      </div>
+      <div class="stat-card" style="--card-accent:var(--green)">
+        <div class="stat-card-icon" style="background:rgba(16,185,129,.15)">📈</div>
+        <div class="stat-card-label">Receitas</div>
+        <div class="stat-card-value text-green" id="stIncome">R$ 0,00</div>
+        <div class="stat-card-sub"              id="stIncomeQty">0 lançamentos</div>
+      </div>
+      <div class="stat-card" style="--card-accent:var(--red)">
+        <div class="stat-card-icon" style="background:rgba(244,63,94,.15)">📉</div>
+        <div class="stat-card-label">Despesas</div>
+        <div class="stat-card-value text-red" id="stExpense">R$ 0,00</div>
+        <div class="stat-card-sub"            id="stExpenseQty">0 lançamentos</div>
+      </div>
+      <div class="stat-card" style="--card-accent:var(--yellow)">
+        <div class="stat-card-icon" style="background:rgba(245,158,11,.15)">📊</div>
+        <div class="stat-card-label">% Comprometida</div>
+        <div class="stat-card-value text-yellow" id="stPct">0%</div>
+        <div class="stat-card-sub">Da receita em despesas</div>
+      </div>
+    </div>
+
+    <!-- BARRAS SEMANAIS -->
+    <div class="card mb-15" id="weekCard">
+      <div class="card-header">
+        <div><div class="card-title">Movimentação Diária</div><div class="card-sub">Receitas e despesas por dia da semana</div></div>
+        <div class="flex gap-sm">
+          <span class="badge badge-green">● Receita</span>
+          <span class="badge badge-red">● Despesa</span>
+        </div>
+      </div>
+      <div class="card-pad">
+        <div id="weekBars" style="display:flex;gap:.65rem;align-items:flex-end;height:90px"></div>
+        <div id="weekDays" style="display:flex;gap:.65rem;margin-top:.4rem"></div>
+      </div>
+    </div>
+
+    <!-- GRID 2: recentes + por categoria -->
+    <div class="grid2 mb-15">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Transações Recentes</div><div class="card-sub" id="recentSub">—</div></div>
+          <button class="btn btn-ghost btn-sm" id="btnVerTodas">Ver todas →</button>
+        </div>
+        <div id="recentList" class="card-pad" style="padding-top:.5rem"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Gastos por Categoria</div><div class="card-sub">Distribuição do período</div></div>
+        </div>
+        <div id="catChart" class="card-pad" style="padding-top:.75rem"></div>
+      </div>
+    </div>
+
+    <!-- HISTÓRICO MENSAL -->
+    <div class="card mb-15">
+      <div class="card-header">
+        <div><div class="card-title">Histórico Mensal</div><div class="card-sub">Todos os meses com transações — clique para analisar</div></div>
+      </div>
+      <div class="card-pad">
+        <div class="month-grid" id="monthHistory"></div>
+      </div>
+    </div>
+
+    <!-- METAS -->
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">Metas Financeiras</div><div class="card-sub">Progresso dos seus objetivos</div></div>
+        <button class="btn btn-ghost btn-sm" id="btnVerMetas">Ver todas →</button>
+      </div>
+      <div class="card-pad" id="dashGoals"></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: TRANSAÇÕES ══ -->
+  <div class="page" id="page-tx">
+    <!-- MINI STATS -->
+    <div class="grid3 mb-15">
+      <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:var(--r3);padding:1.1rem 1.25rem">
+        <div style="font-size:.7rem;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem">Receitas (filtro)</div>
+        <div style="font-size:1.25rem;font-weight:800;color:var(--green2);font-family:var(--mono)" id="txSumIn">R$ 0,00</div>
+      </div>
+      <div style="background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.2);border-radius:var(--r3);padding:1.1rem 1.25rem">
+        <div style="font-size:.7rem;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem">Despesas (filtro)</div>
+        <div style="font-size:1.25rem;font-weight:800;color:var(--red2);font-family:var(--mono)" id="txSumExp">R$ 0,00</div>
+      </div>
+      <div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:var(--r3);padding:1.1rem 1.25rem">
+        <div style="font-size:.7rem;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem">Saldo (filtro)</div>
+        <div style="font-size:1.25rem;font-weight:800;font-family:var(--mono)" id="txSumBal">R$ 0,00</div>
+      </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="card mb-15">
+      <div class="card-pad" style="padding-top:1rem;padding-bottom:1rem">
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+          <div class="input-wrap" style="flex:1;min-width:200px">
+            <span class="input-icon">🔍</span>
+            <input type="text" id="txSearch" class="form-input" placeholder="Pesquisar por descrição ou categoria...">
+          </div>
+          <select id="txFType"  class="form-input" style="width:165px">
+            <option value="">📋 Todos os tipos</option>
+            <option value="income">📈 Receitas</option>
+            <option value="expense">📉 Despesas</option>
+          </select>
+          <select id="txFMonth" class="form-input" style="width:195px">
+            <option value="">📅 Todos os meses</option>
+          </select>
+          <button id="txClear" class="btn btn-ghost btn-sm">✕ Limpar</button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.85rem;padding-top:.85rem;border-top:1px solid var(--b1)">
+          <span class="text-xs text-muted" id="txCount">0 transações</span>
+          <div class="flex gap-sm">
+            <button id="viewList"  class="btn btn-sm" style="background:var(--accent);color:#fff">☰ Lista</button>
+            <button id="viewGroup" class="btn btn-ghost btn-sm">📅 Por mês</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABELA -->
+    <div id="txTableWrap"></div>
+  </div>
+
+  <!-- ══ PAGE: CATEGORIAS ══ -->
+  <div class="page" id="page-cat">
+    <div class="tabs mb-15">
+      <button class="tab-btn active" data-tab="all">Todas</button>
+      <button class="tab-btn" data-tab="income">📈 Receitas</button>
+      <button class="tab-btn" data-tab="expense">📉 Despesas</button>
+    </div>
+    <div class="card"><div class="card-pad" id="catList"></div></div>
+  </div>
+
+  <!-- ══ PAGE: METAS ══ -->
+  <div class="page" id="page-goals">
+    <div id="goalsList"></div>
+  </div>
+
+  <!-- ══ PAGE: PERFIL ══ -->
+  <div class="page" id="page-profile">
+    <div style="max-width:640px">
+      <div class="card mb-15">
+        <div class="card-header"><div><div class="card-title">Informações Pessoais</div><div class="card-sub">Seus dados de conta</div></div></div>
+        <div class="card-pad">
+          <div style="text-align:center;margin-bottom:1.5rem">
+            <div class="avatar-upload" id="profileAvatar" title="Clique para alterar foto">U</div>
+            <input type="file" id="avatarInput" accept="image/*" style="display:none">
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('avatarInput').click()">📷 Alterar foto</button>
+          </div>
+          <div class="form-group"><label class="form-label">Nome completo</label><input type="text" id="pName"  class="form-input"></div>
+          <div class="form-group"><label class="form-label">E-mail</label><input type="email" id="pEmail" class="form-input"></div>
+          <button class="btn btn-primary" id="btnSaveProfile">💾 Salvar alterações</button>
+        </div>
+      </div>
+
+      <!-- ESTATÍSTICAS DA CONTA -->
+      <div class="card mb-15">
+        <div class="card-header"><div><div class="card-title">Estatísticas da Conta</div><div class="card-sub">Resumo geral de todos os seus dados</div></div></div>
+        <div class="card-pad">
+          <div class="grid3" id="profileStats"></div>
+        </div>
+      </div>
+
+      <!-- TROCAR SENHA -->
+      <div class="card mb-15">
+        <div class="card-header"><div><div class="card-title">🔒 Alterar Senha</div><div class="card-sub">Crie uma senha forte para proteger sua conta</div></div></div>
+        <div class="card-pad">
+          <div class="form-group">
+            <label class="form-label">Senha Atual</label>
+            <div style="position:relative">
+              <input type="password" id="oldPass" class="form-input" placeholder="••••••••">
+              <span id="eyeOld" style="position:absolute;right:.9rem;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--t3);user-select:none" onclick="toggleEye('oldPass','eyeOld')">👁</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nova Senha</label>
+            <div style="position:relative">
+              <input type="password" id="newPass" class="form-input" placeholder="Mínimo 6 caracteres">
+              <span id="eyeNew" style="position:absolute;right:.9rem;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--t3);user-select:none" onclick="toggleEye('newPass','eyeNew')">👁</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmar Nova Senha</label>
+            <div style="position:relative">
+              <input type="password" id="confPass" class="form-input" placeholder="Repita a nova senha">
+              <span id="eyeConf" style="position:absolute;right:.9rem;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--t3);user-select:none" onclick="toggleEye('confPass','eyeConf')">👁</span>
+            </div>
+          </div>
+          <button class="btn btn-ghost" id="btnChangePass">🔒 Alterar Senha</button>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(244,63,94,.3)">
+        <div class="card-header"><div><div class="card-title" style="color:var(--red2)">⚠️ Zona de Perigo</div><div class="card-sub">Ações irreversíveis</div></div></div>
+        <div class="card-pad">
+          <p class="text-sm text-muted mb-1">Ao sair, sua sessão será encerrada. Seus dados permanecem salvos com segurança.</p>
+          <button class="btn btn-danger" id="btnLogout2">🚪 Encerrar sessão</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /main-inner -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ════════════ MODAL: TRANSAÇÃO ════════════ -->
+<div class="overlay hidden" id="txModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="txModalTitle">Nova Transação</div>
+        <div style="font-size:.78rem;color:var(--t3);margin-top:3px" id="txModalSub">Preencha os dados abaixo</div>
+      </div>
+      <button class="btn-modal-close" onclick="closeModal('txModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- TIPO -->
+      <div class="type-toggle">
+        <button class="type-btn t-income" id="btnIncome">📈 Receita</button>
+        <button class="type-btn"          id="btnExpense">📉 Despesa</button>
+      </div>
+      <!-- AVISO PERÍODO -->
+      <div id="txPeriodNote" style="display:flex;align-items:center;gap:.5rem;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:var(--r2);padding:.55rem .9rem;margin-bottom:1rem;font-size:.8rem;color:var(--t2)">
+        📆 Lançando em: <strong id="txPeriodNoteLabel" style="color:var(--accent2)">—</strong>
+      </div>
+      <form id="txForm">
+        <input type="hidden" id="txId">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Categoria *</label>
+            <select id="txCat" class="form-input" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data *</label>
+            <input type="date" id="txDate" class="form-input" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descrição *</label>
+          <input type="text" id="txDesc" class="form-input" placeholder="Ex: Salário mensal, Conta de luz..." required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Valor (R$) *</label>
+          <input type="number" id="txAmt" class="form-input" placeholder="0,00" step="0.01" min="0.01" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observações <span class="text-muted">(opcional)</span></label>
+          <textarea id="txNotes" class="form-input" placeholder="Notas adicionais..."></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('txModal')">Cancelar</button>
+      <button class="btn btn-danger btn-sm hidden" id="btnDeleteTx">🗑️ Excluir</button>
+      <button class="btn btn-primary" id="btnSaveTx">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: CATEGORIA ════════════ -->
+<div class="overlay hidden" id="catModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="catModalTitle">Nova Categoria</div>
+      <button class="btn-modal-close" onclick="closeModal('catModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="catForm">
+        <input type="hidden" id="catId">
+        <div class="form-group"><label class="form-label">Nome *</label><input type="text" id="catName" class="form-input" placeholder="Ex: Alimentação" required></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Tipo *</label>
+            <select id="catType" class="form-input">
+              <option value="expense">📉 Despesa</option>
+              <option value="income">📈 Receita</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ícone (emoji)</label>
+            <input type="text" id="catIcon" class="form-input" placeholder="💰" maxlength="4" style="font-size:1.4rem;text-align:center">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cor</label>
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <input type="color" id="catColor" value="#6366F1" style="width:44px;height:38px;border-radius:var(--r2);border:1px solid var(--b1);background:var(--bg3);padding:2px;cursor:pointer">
+            <span class="text-sm text-muted">Escolha uma cor para identificar a categoria</span>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost"  onclick="closeModal('catModal')">Cancelar</button>
+      <button class="btn btn-danger btn-sm hidden" id="btnDeleteCat">🗑️ Excluir</button>
+      <button class="btn btn-primary" id="btnSaveCat">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: META ════════════ -->
+<div class="overlay hidden" id="goalModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="goalModalTitle">Nova Meta</div>
+      <button class="btn-modal-close" onclick="closeModal('goalModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="goalForm">
+        <input type="hidden" id="goalId">
+        <div class="form-group"><label class="form-label">Título *</label><input type="text" id="goalTitle" class="form-input" placeholder="Ex: Viagem para Europa" required></div>
+        <div class="form-group"><label class="form-label">Descrição</label><input type="text" id="goalDesc" class="form-input" placeholder="Detalhes da meta..."></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Valor Alvo (R$) *</label><input type="number" id="goalTarget" class="form-input" placeholder="0,00" step="0.01" min="0.01" required></div>
+          <div class="form-group"><label class="form-label">Valor Atual (R$)</label><input type="number" id="goalCurrent" class="form-input" placeholder="0,00" step="0.01" min="0" value="0"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Data Limite</label><input type="date" id="goalDeadline" class="form-input"></div>
+          <div class="form-group hidden" id="goalStatusGroup">
+            <label class="form-label">Status</label>
+            <select id="goalStatus" class="form-input">
+              <option value="active">🟢 Ativa</option>
+              <option value="completed">✅ Concluída</option>
+              <option value="cancelled">❌ Cancelada</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost"  onclick="closeModal('goalModal')">Cancelar</button>
+      <button class="btn btn-danger btn-sm hidden" id="btnDeleteGoal">🗑️ Excluir</button>
+      <button class="btn btn-primary" id="btnSaveGoal">Salvar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════ MODAL CONFIRMAÇÃO ════ -->
+<div class="overlay hidden" id="confirmOverlay" style="z-index:2000">
+  <div class="modal" style="max-width:380px;text-align:center">
+    <div style="font-size:2.5rem;margin-bottom:1rem">⚠️</div>
+    <div class="modal-title" style="margin-bottom:.65rem">Confirmar ação</div>
+    <p id="confirmMsg" style="color:var(--t2);font-size:.9rem;line-height:1.6;margin-bottom:1.75rem"></p>
+    <div style="display:flex;gap:.75rem;justify-content:center">
+      <button id="confirmNo"  class="btn btn-ghost" style="flex:1">Cancelar</button>
+      <button id="confirmYes" class="btn btn-danger" style="flex:1">Sim, excluir</button>
+    </div>
+  </div>
+</div>
+<script src="js/core.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
