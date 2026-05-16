@@ -1,5 +1,11 @@
 const API_URL = "https://finaceiropro2.onrender.com";
 
+async function login() {
+   var r = await fetch(`${API_URL}/api/auth/login`, {
+      method: 'POST'
+   });
+}
+
 const Auth = {
   token:    () => localStorage.getItem('fp_token'),
   user:     () => { try{ return JSON.parse(localStorage.getItem('fp_user')); }catch(e){ return null; } },
